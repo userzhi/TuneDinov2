@@ -11,7 +11,7 @@ class FgClassifier(nn.Module):
 
     """
     def __init__(self, input_dim: int, hidden_dim: int, 
-                 output_dim: int, num_layers: int, dp: float=0.1):
+                 output_dim: int, num_layers: int, dp: float=0.1, sigmoid_output: bool = False,):
         super().__init__()
 
         self.num_layers = num_layers
@@ -27,13 +27,14 @@ class FgClassifier(nn.Module):
            ModuleList用来存储所有层，以便在forward函数中访问
         """
         self.dp = dp
+        self.sigmoid_output = sigmoid_output
         self.linear = nn.Linear(1024, 1024)
     
     
     def forward(self, x):
         
         x = self.linear(x)
-        
+
         for i, layer in enumerate(self.layers):
             x = F.relu(layer(x)) if i < self.num_layers - 1 else layer(x)
             """如果当前层不是最后一层，使用ReLU激活函数"""

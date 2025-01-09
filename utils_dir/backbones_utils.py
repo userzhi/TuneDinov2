@@ -17,6 +17,8 @@ def load_backbone(backbone_type):
     for name, paramater in model.named_parameters():
         paramater.requires_grad = False
 
+    model.eval()
+
     return model
 
 
@@ -38,7 +40,6 @@ def prepare_image_for_backbone(input_tensor, backbone_type):
     
     # Normalize the tensor
     normalized_tensor = (input_tensor - mean[:, None, None]) / std[:, None, None]
-
     return normalized_tensor
 
 
