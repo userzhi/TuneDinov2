@@ -10,6 +10,7 @@ from datasets import init_dataloaders
 from model.fg_classifier import FgClassifier
 from utils_dir.backbones_utils import load_backbone, extract_backbone_features
 
+
 def get_argparse():
     parser = ArgumentParser()
     parser.add_argument('--train_root_dir', type=str)
@@ -70,8 +71,9 @@ def train(args):
         # 当训练到最后一个epoch, 保存最后的结果
 
 if __name__ == '__main__':
-    args = get_argparse()
-    train(args)
+    # args = get_argparse()
+    # train(args)
+
 
 
 

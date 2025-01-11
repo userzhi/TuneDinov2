@@ -1,7 +1,7 @@
 import torch
 import albumentations as A
 from torch.utils.data import DataLoader
-from datasets.dataset import BoxDataset, OBBDataset
+from .dataset import BoxDataset
 
 
 def get_base_new_classes(dataset):
@@ -27,8 +27,6 @@ def init_dataloaders(args):
 
     if annotations == 'box':
         dataClass = BoxDataset
-    elif annotations == 'obb':
-        dataClass = OBBDataset
     else:
         raise ValueError(f"Invalid annotations type: {annotations}")
 
@@ -48,8 +46,8 @@ def init_dataloaders(args):
             args.train_annotations_file,
             augmentations=train_augmentations,
             target_size=args.target_size
-        )
-       
+        ) 
+        
         train_dataloader = DataLoader(
             train_dataset, 
             batch_size=args.batch_size, 

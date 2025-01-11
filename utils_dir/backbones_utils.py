@@ -10,7 +10,7 @@ def load_backbone(backbone_type):
     '''
     if backbone_type == 'dinov2':
         # 分为两种情况，可以分别从github加载和本地加载
-        path = '/hy-tmp/TuneDinov2/CrowdSAM/dinov2'  # 本地加载
+        path = '/hy-tmp/dinov2'  # 本地加载
         model = torch.hub.load(path, 'dinov2_vitl14', source='local')
         # model = torch.hub.load('facebookresearch/dinov2', 'dinov2_vitl14')  # github加载
     
