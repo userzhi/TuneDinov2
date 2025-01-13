@@ -2,12 +2,15 @@ from tqdm import tqdm
 from  argparse import ArgumentParser
 
 import torch
+import torch.nn as nn
 import torch.optim as optim
 from torch.utils.tensorboard import SummaryWriter
 from torch.optim.lr_scheduler import StepLR, MultiStepLR
 
+
 from datasets import init_dataloaders
 from model.fg_classifier import FgClassifier
+from utils_dir.bbox_to_label import bbox_to_label_multiple_classify_proto
 from utils_dir.backbones_utils import load_backbone, extract_backbone_features
 
 
@@ -36,37 +39,47 @@ def get_argparse():
 def train(args):
     
     writer = SummaryWriter('/hy-tmp/TuneDinov2/tensorboard')
-    # load backbone
-    dinov2_backbone = load_backbone(args.backbone_type)
-    model = FgClassifier()
+    device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
-    # load dataset    
+    # 加载模型
+    backbone = load_backbone(args.backbone_type)
+    model = FgClassifier()
+    model.to(device)
+
+    # 加载dataloader  
     train_dataloader = init_dataloaders(args)
 
-    # optimizer and scheduler
+    # 加载优化器
     optimizer = optim.Adam(model.parameters(), lr=args.lr)
     torch.autograd.set_detect_anomaly(True)
     scheduler = MultiStepLR(optimizer, milestones=[10, 100], gamma=args.lr_decay)
+    
+    # 损失函数
+    criterion = nn.CrossEntropyLoss()
 
     for epoch in range(args.num_epochs):
-
         for i, batch in tqdm(enumerate(train_dataloader), total=len(train_dataloader), 
                              desc=f'Val Epoch {epoch + 1}/{args.num_epochs}', leave=False):
             images, boxes, labels, _ = batch
 
-            feats = extract_backbone_features(images, dinov2_backbone, "dinov2")
-            output = model(feats)
+            feats = extract_backbone_features(images, backbone, "dinov2")
+            batch_patch_label = bbox_to_label_multiple_classify_proto(feats, boxes, labels)
+            batch_patch_label =  batch_patch_label.to(device)
 
-            # compute loss
-            # 重点在于如何定义损失函数: 从二值分类出发。
-            loss = 
+            outputs = model(feats)
+
+            loss = criterion(outputs, batch_patch_label)
             optimizer.zero_grad()
             loss.backward()
             optimizer
 
         scheduler.step()
-    
+        
         # 隔10 epoch，保存一次训练结果
+        if epoch % 10 == 0:
+            torch.save
+
+
         
         # 当训练到最后一个epoch, 保存最后的结果
 
