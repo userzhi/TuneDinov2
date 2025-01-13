@@ -1,7 +1,7 @@
 import torch
 
 
-def load_backbone(backbone_type):
+def load_backbone(backbone_type, device):
     '''
     Load a pre-trained backbone model.
 
@@ -16,9 +16,10 @@ def load_backbone(backbone_type):
     
     for name, paramater in model.named_parameters():
         paramater.requires_grad = False
-
+    
+    model.to(device)
     model.eval()
-
+   
     return model
 
 

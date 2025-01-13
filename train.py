@@ -42,7 +42,7 @@ def train(args):
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
     # 加载模型
-    backbone = load_backbone(args.backbone_type)
+    backbone = load_backbone(args.backbone_type, device)
     model = FgClassifier()
     model.to(device)
 
@@ -60,6 +60,7 @@ def train(args):
     for epoch in range(args.num_epochs):
         for i, batch in tqdm(enumerate(train_dataloader), total=len(train_dataloader), 
                              desc=f'Val Epoch {epoch + 1}/{args.num_epochs}', leave=False):
+            
             images, boxes, labels, _ = batch
 
             feats = extract_backbone_features(images, backbone, "dinov2")
